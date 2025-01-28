@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   content: string;
@@ -82,20 +83,22 @@ export default function ChatPage() {
                 <div
                   key={index}
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    msg.role === 'user' 
+                      ? 'bg-primary text-primary-foreground'
+                      : msg.role === 'error'
+                      ? 'bg-destructive text-destructive-foreground'
+                      : 'bg-muted'
+                  }`}
                 >
-                  <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      msg.role === 'user' 
-                        ? 'bg-primary text-primary-foreground'
-                        : msg.role === 'error'
-                        ? 'bg-destructive text-destructive-foreground'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <p className="break-words">{msg.content}</p>
-                  </div>
+                  <ReactMarkdown className="prose dark:prose-invert break-words">
+                    {msg.content}
+                  </ReactMarkdown>
                 </div>
-              ))}
+              </div>
+            ))} 
             </div>
           </ScrollArea>
 
