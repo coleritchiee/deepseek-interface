@@ -4,21 +4,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+
+interface Message {
+  content: string;
+  role: 'user' | 'assistant' | 'error';
+}
 
 export default function ChatPage() {
   const { messages, saveMessages, clearHistory } = useChatHistory();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef(null);
+  const scrollRef = useRef<HTMLDivElement>(null); // Add proper type to ref
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
-    const newMessages = [...messages, { content: input, role: 'user' }];
+    const newMessages: Message[] = [...messages, { content: input, role: 'user' }];
     saveMessages(newMessages);
 
     try {
@@ -26,7 +31,7 @@ export default function ChatPage() {
         messages: newMessages
       });
 
-      const updatedMessages = [
+      const updatedMessages: Message[] = [
         ...newMessages,
         { content: response.data.response, role: 'assistant' }
       ];
@@ -34,7 +39,7 @@ export default function ChatPage() {
       saveMessages(updatedMessages);
     } catch (error) {
       console.error('Error:', error);
-      const errorMessages = [
+      const errorMessages: Message[] = [
         ...newMessages,
         { content: 'Error fetching response', role: 'error' }
       ];
@@ -53,6 +58,7 @@ export default function ChatPage() {
   }, [messages]);
 
   return (
+    <div className = "dark">
     <div className="flex flex-col h-screen p-4">
       <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
         <div className="flex justify-between items-center mb-4">
@@ -69,7 +75,7 @@ export default function ChatPage() {
         <Card className="flex-1 flex flex-col overflow-hidden">
           <ScrollArea 
             className="flex-1 p-4" 
-            viewportRef={scrollRef}
+            ref={scrollRef} // Changed from viewportRef to ref
           >
             <div className="space-y-4">
               {messages.map((msg, index) => (
@@ -112,6 +118,7 @@ export default function ChatPage() {
           </form>
         </Card>
       </div>
+    </div>
     </div>
   );
 }
